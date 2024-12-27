@@ -1,0 +1,53 @@
+import matplotlib.pyplot as plt
+
+def get_dna_sequence():
+    dna = input("Enter a DNA sequence: ").upper()
+    return dna
+
+def validate_dna_sequence(dna):
+    if not set(dna).issubset({'A', 'T', 'G', 'C'}):
+        raise ValueError("Invalid DNA sequence! Only A, T, G, and C are allowed.")
+    
+def divide_into_codons(dna):
+    # Ensure the sequence length is a multiple of 3
+    trimmed_dna = dna[:len(dna) - (len(dna) % 3)]
+    return [trimmed_dna[i:i+3] for i in range(0, len(trimmed_dna), 3)]
+
+from collections import Counter
+
+def calculate_codon_frequency(codons):
+    total_codons = len(codons)
+    codon_counts = Counter(codons)
+    codon_frequencies = {codon: count / total_codons for codon, count in codon_counts.items()}
+    return codon_counts, codon_frequencies
+
+def display_results(codon_counts, codon_frequencies):
+    print("\nCodon Usage Analysis:")
+    print(f"{'Codon':<10}{'Count':<10}{'Frequency (%)':<15}")
+    print("-" * 35)
+    for codon, count in codon_counts.items():
+        frequency = codon_frequencies[codon] * 100
+        print(f"{codon:<10}{count:<10}{frequency:<15.2f}")
+
+def main():
+    try:
+        dna = get_dna_sequence()
+        validate_dna_sequence(dna)
+        codons = divide_into_codons(dna)
+        codon_counts, codon_frequencies = calculate_codon_frequency(codons)
+        display_results(codon_counts, codon_frequencies)
+    except ValueError as e:
+        print(f"Error: {e}")
+
+if __name__ == "__main__":
+    main()
+
+#%%
+def plot_codon_usage(codon_counts):
+    codons = list(codon_counts.keys())
+    counts = list(codon_counts.values())
+    plt.bar(codons, counts)
+    plt.xlabel('Codons')
+    plt.ylabel('Counts')
+    plt.title('Codon Usage')
+    plt.show()
